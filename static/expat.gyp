@@ -1,5 +1,5 @@
 {
-    'includes': ['common.gyp', 'locations.gyp'],
+    'includes': ['common.gyp', 'locations.gypi'],
     'targets': [{
         'target_name': 'expat',
         'type': 'static_library',

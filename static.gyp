@@ -1,5 +1,5 @@
 {
-    'includes': ['static/locations.gyp'],
+    'includes': ['static/locations.gypi'],
     'variables':
     {
         'ensure_deps%': '<!(static/ensure_deps.sh)',
