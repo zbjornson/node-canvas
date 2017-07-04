@@ -22,6 +22,12 @@ typedef enum {
   TEXT_DRAW_GLYPHS
 } canvas_draw_mode_t;
 
+typedef enum {
+  DIRECTION_RTL,
+  DIRECTION_LTR,
+  DIRECTION_INHERIT
+} canvas_direction_t;
+
 /*
  * State struct.
  *
@@ -46,6 +52,7 @@ typedef struct {
   double shadowOffsetY;
   canvas_draw_mode_t textDrawingMode;
   PangoFontDescription *fontDescription;
+  canvas_direction_t textDirection;
 } canvas_state_t;
 
 void state_assign_fontFamily(canvas_state_t *state, const char *str);
@@ -115,6 +122,7 @@ class Context2d: public Nan::ObjectWrap {
     static NAN_GETTER(GetAntiAlias);
     static NAN_GETTER(GetTextDrawingMode);
     static NAN_GETTER(GetFilter);
+    static NAN_GETTER(GetDirection);
     static NAN_SETTER(SetPatternQuality);
     static NAN_SETTER(SetGlobalCompositeOperation);
     static NAN_SETTER(SetGlobalAlpha);
@@ -130,6 +138,7 @@ class Context2d: public Nan::ObjectWrap {
     static NAN_SETTER(SetAntiAlias);
     static NAN_SETTER(SetTextDrawingMode);
     static NAN_SETTER(SetFilter);
+    static NAN_SETTER(SetDirection);
     inline void setContext(cairo_t *ctx) { _context = ctx; }
     inline cairo_t *context(){ return _context; }
     inline Canvas *canvas(){ return _canvas; }

@@ -140,6 +140,7 @@ Context2d::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target) {
   Nan::SetAccessor(proto, Nan::New("antialias").ToLocalChecked(), GetAntiAlias, SetAntiAlias);
   Nan::SetAccessor(proto, Nan::New("textDrawingMode").ToLocalChecked(), GetTextDrawingMode, SetTextDrawingMode);
   Nan::SetAccessor(proto, Nan::New("filter").ToLocalChecked(), GetFilter, SetFilter);
+  Nan::SetAccessor(proto, Nan::New("direction").ToLocalChecked(), GetDirection, SetDirection);
   Nan::Set(target, Nan::New("CanvasRenderingContext2d").ToLocalChecked(), ctor->GetFunction());
 }
 
@@ -168,6 +169,7 @@ Context2d::Context2d(Canvas *canvas) {
   state->patternQuality = CAIRO_FILTER_GOOD;
   state->textDrawingMode = TEXT_DRAW_PATHS;
   state->fontDescription = pango_font_description_from_string("sans serif");
+  state->textDirection = DIRECTION_INHERIT;
   pango_font_description_set_absolute_size(state->fontDescription, 10 * PANGO_SCALE);
   pango_layout_set_font_description(_layout, state->fontDescription);
 }
@@ -1236,6 +1238,38 @@ NAN_SETTER(Context2d::SetFilter) {
 }
 
 /*
+ * Get direction.
+ */
+
+NAN_GETTER(Context2d::GetDirection) {
+  Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
+  const char *dirString;
+  switch (context->state->textDirection) {
+  case DIRECTION_LTR: dirString = "ltr"; break;
+  case DIRECTION_RTL: dirString = "rtl"; break;
+  case DIRECTION_INHERIT: default: dirString = "inherit"; break;
+  }
+  info.GetReturnValue().Set(Nan::New(dirString).ToLocalChecked());
+}
+
+/*
+* Set direction.
+*/
+
+
+NAN_SETTER(Context2d::SetDirection) {
+  String::Utf8Value str(value->ToString());
+  Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
+  if (0 == strcmp("inherit", *str)) {
+    context->state->textDirection = DIRECTION_INHERIT;
+  } else if (0 == strcmp("ltr", *str)) {
+    context->state->textDirection = DIRECTION_LTR;
+  } else if (0 == strcmp("rtl", *str)) {
+    context->state->textDirection = DIRECTION_RTL;
+  }
+}
+
+/*
  * Get miter limit.
  */
 
@@ -1743,6 +1777,16 @@ Context2d::setTextPath(const char *str, double x, double y) {
       break;
   }
 
+  switch (state->textDirection) {
+    case DIRECTION_INHERIT:
+    case DIRECTION_LTR:
+      pango_context_set_base_dir(pango_layout_get_context(_layout), PANGO_DIRECTION_LTR);
+      break;
+    case DIRECTION_RTL:
+      pango_context_set_base_dir(pango_layout_get_context(_layout), PANGO_DIRECTION_RTL);
+      break;
+  }
+
   if (metrics) pango_font_metrics_unref(metrics);
 
   cairo_move_to(_context, x, y);
@@ -1877,6 +1921,16 @@ NAN_METHOD(Context2d::MeasureText) {
       break;
     default:
       y_offset = 0.0;
+  }
+
+  switch (context->state->textDirection) {
+  case DIRECTION_INHERIT:
+  case DIRECTION_LTR:
+    pango_context_set_base_dir(pango_layout_get_context(layout), PANGO_DIRECTION_LTR);
+    break;
+  case DIRECTION_RTL:
+    pango_context_set_base_dir(pango_layout_get_context(layout), PANGO_DIRECTION_RTL);
+    break;
   }
 
   obj->Set(Nan::New<String>("width").ToLocalChecked(),
