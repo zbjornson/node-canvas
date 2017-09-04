@@ -755,10 +755,10 @@ Canvas::ResolveFontDescription(const PangoFontDescription *desc) {
 
         // Avoid sending duplicate SFNT font names due to a bug in Pango for macOS:
         // https://bugzilla.gnome.org/show_bug.cgi?id=762873
-        if (g_hash_table_add(seen_families, name)) {
-          if (renamed_families->len) g_string_append(renamed_families, ",");
-          g_string_append(renamed_families, name);
-        }
+        // if (g_hash_table_add(seen_families, name)) {
+        //   if (renamed_families->len) g_string_append(renamed_families, ",");
+        //   g_string_append(renamed_families, name);
+        // }
 
         if (i == 0 && (best.user_desc == NULL || pango_font_description_better_match(desc, best.user_desc, it->user_desc))) {
           best = *it;
