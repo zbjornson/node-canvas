@@ -7,7 +7,7 @@ environment:
 image:
   - Visual Studio 2013
   - Visual Studio 2015
-  - Visual Studio 2017
+max_jobs: 100
 install:
   - ps: Install-Product node $env:nodejs_version x64
   # Sets Windows 7.1 SDK env vars.
