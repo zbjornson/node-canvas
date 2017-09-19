@@ -212,6 +212,28 @@ Image::clearData() {
  * Set src path.
  */
 
+struct as_clo_t {
+  Persistent<Object> _this;
+} ;
+
+#include <iostream>
+#include <chrono>
+#include <time.h>
+
+void LoadedCallback(uv_async_t* handle) {
+  Nan::HandleScope scope;
+  as_clo_t* workdata = static_cast<as_clo_t*>(handle->data);
+  unsigned long milliseconds_since_epoch =
+    std::chrono::duration_cast<std::chrono::milliseconds>
+    (std::chrono::system_clock::now().time_since_epoch()).count();
+  std::cout << milliseconds_since_epoch << std::endl;
+  Local<Object> _this = Nan::New(workdata->_this);
+  Local<Value> onloadFn = _this->Get(Nan::New("onload").ToLocalChecked());
+  if (onloadFn->IsFunction()) {
+    onloadFn.As<Function>()->Call(Isolate::GetCurrent()->GetCurrentContext()->Global(), 0, NULL);
+  }
+}
+
 NAN_SETTER(Image::SetSource) {
   Image *img = Nan::ObjectWrap::Unwrap<Image>(info.This());
   cairo_status_t status = CAIRO_STATUS_READ_ERROR;
@@ -240,10 +262,20 @@ NAN_SETTER(Image::SetSource) {
     }
   } else {
     img->loaded();
-    Local<Value> onloadFn = info.This()->Get(Nan::New("onload").ToLocalChecked());
-    if (onloadFn->IsFunction()) {
-      onloadFn.As<Function>()->Call(Isolate::GetCurrent()->GetCurrentContext()->Global(), 0, NULL);
-    }
+
+    unsigned long milliseconds_since_epoch =
+      std::chrono::duration_cast<std::chrono::milliseconds>
+      (std::chrono::system_clock::now().time_since_epoch()).count();
+    std::cout << milliseconds_since_epoch << std::endl;
+    uv_async_t *async = new uv_async_t;
+
+    as_clo_t *workdata = new as_clo_t();
+
+    workdata->_this.Reset(Isolate::GetCurrent(), info.This());
+    async->data = workdata;
+
+    uv_async_init(uv_default_loop(), async, LoadedCallback);
+    uv_async_send(async);
   }
 }
 
