@@ -143,6 +143,19 @@ tests['arc() 2'] = function (ctx) {
   }
 }
 
+tests['arc() 3'] = function (ctx) {
+  // See #274
+  ctx.beginPath()
+  ctx.arc(100, 100, 50, Math.PI * 2, false)
+  ctx.stroke()
+}
+
+tests['arc() 4'] = function (ctx) {
+  ctx.beginPath()
+  ctx.arc(100, 100, 50, Math.PI / 2, Math.PI, true)
+  ctx.stroke()
+}
+
 tests['arcTo()'] = function (ctx) {
   ctx.fillStyle = '#08C8EE'
   ctx.translate(-50, -50)

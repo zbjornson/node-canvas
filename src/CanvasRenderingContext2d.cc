@@ -2520,18 +2520,14 @@ NAN_METHOD(Context2d::Rect) {
  */
 
 NAN_METHOD(Context2d::Arc) {
-  if (!info[0]->IsNumber()
-    || !info[1]->IsNumber()
-    || !info[2]->IsNumber()
-    || !info[3]->IsNumber()
-    || !info[4]->IsNumber()) return;
-
+  // See #274 - Browsers coerce all args to number values
   bool anticlockwise = info[5]->BooleanValue();
 
   Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
   cairo_t *ctx = context->context();
 
-  if (anticlockwise && M_PI * 2 != info[4]->NumberValue()) {
+  double i4 = info[4]->NumberValue();
+  if (i4 == 0 || (anticlockwise && M_PI * 2 != i4)) {
     cairo_arc_negative(ctx
       , info[0]->NumberValue()
       , info[1]->NumberValue()
