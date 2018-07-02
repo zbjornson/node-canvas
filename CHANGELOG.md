@@ -16,18 +16,22 @@ canvas.createJPEGStream({quality: 50}) // old
 canvas.createJPEGStream({quality: 0.5}) // new
 
 // (2) The ZLIB compression level and PNG filter options for canvas.toBuffer are
-//     now named instead of positional arguments:
+//     now named instead of positional arguments (see also #4):
 canvas.toBuffer(undefined, 3, canvas.PNG_FILTER_NONE) // old
-canvas.toBuffer(undefined, {compressionLevel: 3, filters: canvas.PNG_FILTER_NONE}) // new
+canvas.toBuffer(undefined, {compressionLevel: 3, filters: Canvas.PNG_FILTER_NONE}) // new
 // or specify the mime type explicitly:
-canvas.toBuffer("image/png", {compressionLevel: 3, filters: canvas.PNG_FILTER_NONE}) // new
+canvas.toBuffer("image/png", {compressionLevel: 3, filters: Canvas.PNG_FILTER_NONE}) // new
 
 // (3) #2 also applies for canvas.pngStream, although these arguments were not
 //     documented:
 canvas.pngStream(3, canvas.PNG_FILTER_NONE) // old
-canvas.pngStream({compressionLevel: 3, filters: canvas.PNG_FILTER_NONE}) // new
+canvas.pngStream({compressionLevel: 3, filters: Canvas.PNG_FILTER_NONE}) // new
 
-// (4) canvas.syncPNGStream() and canvas.syncJPEGStream() have been removed:
+// (4) PNG filters are now on the Canvas constructor instead of prototype:
+canvas.toBuffer(undefined, 3, canvas.PNG_FILTER_NONE) // old (lower-case)
+canvas.toBuffer(undefined, 3, Canvas.PNG_FILTER_NONE) // new (upper-case)
+
+// (5) canvas.syncPNGStream() and canvas.syncJPEGStream() have been removed:
 canvas.syncPNGStream() // old
 canvas.createSyncPNGStream() // old
 canvas.createPNGStream() // new
@@ -47,6 +51,7 @@ canvas.createJPEGStream() // new
  * Make the `compressionLevel` and `filters` arguments for `canvas.toBuffer()`
    named instead of positional. Same for `canvas.pngStream()`, although these
    arguments were not documented.
+ * Move the PNG filter constants from the Canvas prototype to the constructor.
 
 ### Fixed
  * Prevent segfaults caused by loading invalid fonts (#1105)

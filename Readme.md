@@ -183,7 +183,7 @@ If a callback is provided, none.
 const buf = canvas.toBuffer()
 
 // PNG-encoded, zlib compression level 3 for faster compression but bigger files, no filtering
-const buf2 = canvas.toBuffer('image/png', {compressionLevel: 3, filters: canvas.PNG_FILTER_NONE})
+const buf2 = canvas.toBuffer('image/png', {compressionLevel: 3, filters: Canvas.PNG_FILTER_NONE})
 
 // JPEG-encoded, 50% quality
 const buf3 = canvas.toBuffer('image/jpeg', {quality: 0.5})

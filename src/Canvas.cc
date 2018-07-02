@@ -63,13 +63,13 @@ Canvas::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target) {
   SetProtoAccessor(proto, Nan::New("width").ToLocalChecked(), GetWidth, SetWidth, ctor);
   SetProtoAccessor(proto, Nan::New("height").ToLocalChecked(), GetHeight, SetHeight, ctor);
 
-  Nan::SetTemplate(proto, "PNG_NO_FILTERS", Nan::New<Uint32>(PNG_NO_FILTERS));
-  Nan::SetTemplate(proto, "PNG_FILTER_NONE", Nan::New<Uint32>(PNG_FILTER_NONE));
-  Nan::SetTemplate(proto, "PNG_FILTER_SUB", Nan::New<Uint32>(PNG_FILTER_SUB));
-  Nan::SetTemplate(proto, "PNG_FILTER_UP", Nan::New<Uint32>(PNG_FILTER_UP));
-  Nan::SetTemplate(proto, "PNG_FILTER_AVG", Nan::New<Uint32>(PNG_FILTER_AVG));
-  Nan::SetTemplate(proto, "PNG_FILTER_PAETH", Nan::New<Uint32>(PNG_FILTER_PAETH));
-  Nan::SetTemplate(proto, "PNG_ALL_FILTERS", Nan::New<Uint32>(PNG_ALL_FILTERS));
+  Nan::SetTemplate(ctor, "PNG_NO_FILTERS", Nan::New<Uint32>(PNG_NO_FILTERS));
+  Nan::SetTemplate(ctor, "PNG_FILTER_NONE", Nan::New<Uint32>(PNG_FILTER_NONE));
+  Nan::SetTemplate(ctor, "PNG_FILTER_SUB", Nan::New<Uint32>(PNG_FILTER_SUB));
+  Nan::SetTemplate(ctor, "PNG_FILTER_UP", Nan::New<Uint32>(PNG_FILTER_UP));
+  Nan::SetTemplate(ctor, "PNG_FILTER_AVG", Nan::New<Uint32>(PNG_FILTER_AVG));
+  Nan::SetTemplate(ctor, "PNG_FILTER_PAETH", Nan::New<Uint32>(PNG_FILTER_PAETH));
+  Nan::SetTemplate(ctor, "PNG_ALL_FILTERS", Nan::New<Uint32>(PNG_ALL_FILTERS));
 
   // Class methods
   Nan::SetMethod(ctor, "_registerFont", RegisterFont);
