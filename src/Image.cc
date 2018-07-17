@@ -227,6 +227,8 @@ NAN_SETTER(Image::SetSource) {
   cairo_status_t status = CAIRO_STATUS_READ_ERROR;
 
   img->clearData();
+  // Clear errno in case some unrelated previous syscall failed
+  errno = 0;
 
   // url string
   if (value->IsString()) {
@@ -245,7 +247,13 @@ NAN_SETTER(Image::SetSource) {
   if (status) {
     Local<Value> onerrorFn = info.This()->Get(Nan::New("onerror").ToLocalChecked());
     if (onerrorFn->IsFunction()) {
-      Local<Value> argv[1] = { Canvas::Error(status) };
+      Local<Value> argv[1];
+      if (errno) {
+        Nan::Utf8String src(value);
+        argv[0] = Nan::ErrnoException(errno, "fopen", nullptr, *src);
+      } else {      
+        argv[0] = Canvas::Error(status);
+      }
       onerrorFn.As<Function>()->Call(Isolate::GetCurrent()->GetCurrentContext()->Global(), 1, argv);
     }
   } else {

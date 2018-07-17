@@ -83,6 +83,15 @@ describe('Image', function () {
     return assertRejects(loadImage(`${png_clock}fail`), Error)
   })
 
+  it('returns a nice, coded error for fopen failures', function (done) {
+    const img = new Image()
+    img.onerror = err => {
+      assert.equal(err.code, 'ENOENT')
+      done()
+    }
+    img.src = 'path/to/nothing'
+  })
+
   it('calls Image#onerror multiple times', function () {
     return loadImage(png_clock).then((img) => {
       let onloadCalled = 0
