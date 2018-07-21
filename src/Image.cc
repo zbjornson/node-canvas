@@ -25,8 +25,8 @@ typedef struct {
 #include <csetjmp>
 
 struct canvas_jpeg_error_mgr: jpeg_error_mgr {
-  private: char unused[8];
-  public: jmp_buf setjmp_buffer;
+    Image* image;
+    jmp_buf setjmp_buffer;
 };
 #endif
 
@@ -251,6 +251,8 @@ NAN_SETTER(Image::SetSource) {
       if (errno) {
         Nan::Utf8String src(value);
         argv[0] = Nan::ErrnoException(errno, "fopen", nullptr, *src);
+      } else if (img->errMsg) {
+        argv[0] = Nan::Error(Nan::New(img->errMsg).ToLocalChecked());
       } else {      
         argv[0] = Canvas::Error(status);
       }
@@ -356,6 +358,7 @@ Image::Image() {
 
 Image::~Image() {
   clearData();
+  if (this->errMsg) delete[] this->errMsg;
 }
 
 /*
@@ -812,11 +815,19 @@ Image::decodeJPEGIntoSurface(jpeg_decompress_struct *args) {
  * Callback to recover from jpeg errors
  */
 
-METHODDEF(void) canvas_jpeg_error_exit (j_common_ptr cinfo) {
+static void canvas_jpeg_error_exit(j_common_ptr cinfo) {
   canvas_jpeg_error_mgr *cjerr = static_cast<canvas_jpeg_error_mgr*>(cinfo->err);
-
+  cjerr->output_message(cinfo);
   // Return control to the setjmp point
   longjmp(cjerr->setjmp_buffer, 1);
+}
+
+// Callback to store messages from libjpeg.
+static void canvas_jpeg_output_message(j_common_ptr cinfo) {
+  canvas_jpeg_error_mgr *cjerr = static_cast<canvas_jpeg_error_mgr*>(cinfo->err);
+  // (Only the last message will be returned to JS land.)
+  if (cjerr->image->errMsg == NULL) cjerr->image->errMsg = new char[JMSG_LENGTH_MAX];
+  cjerr->format_message(cinfo, cjerr->image->errMsg);
 }
 
 #if CAIRO_VERSION_MINOR >= 10
@@ -939,8 +950,10 @@ Image::loadJPEGFromBuffer(uint8_t *buf, unsigned len) {
   struct jpeg_decompress_struct args;
   struct canvas_jpeg_error_mgr err;
 
+  err.image = this;
   args.err = jpeg_std_error(&err);
   args.err->error_exit = canvas_jpeg_error_exit;
+  args.err->output_message = canvas_jpeg_output_message;
 
   // Establish the setjmp return context for canvas_jpeg_error_exit to use
   if (setjmp(err.setjmp_buffer)) {

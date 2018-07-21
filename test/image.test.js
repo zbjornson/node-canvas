@@ -92,6 +92,15 @@ describe('Image', function () {
     img.src = 'path/to/nothing'
   })
 
+  it('captures errors from libjpeg', function (done) {
+    const img = new Image()
+    img.onerror = err => {
+      assert.equal(err.message, "JPEG datastream contains no image")
+      done()
+    }
+    img.src = `${__dirname}/fixtures/159-crash1.jpg`
+  })
+
   it('calls Image#onerror multiple times', function () {
     return loadImage(png_clock).then((img) => {
       let onloadCalled = 0
