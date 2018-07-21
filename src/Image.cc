@@ -844,8 +844,10 @@ Image::decodeJPEGBufferIntoMimeSurface(uint8_t *buf, unsigned len) {
   struct jpeg_decompress_struct args;
   struct canvas_jpeg_error_mgr err;
 
+  err.image = this;
   args.err = jpeg_std_error(&err);
   args.err->error_exit = canvas_jpeg_error_exit;
+  args.err->output_message = canvas_jpeg_output_message;
 
   // Establish the setjmp return context for canvas_jpeg_error_exit to use
   if (setjmp(err.setjmp_buffer)) {
@@ -992,8 +994,10 @@ Image::loadJPEG(FILE *stream) {
     struct jpeg_decompress_struct args;
     struct canvas_jpeg_error_mgr err;
 
+    err.image = this;
     args.err = jpeg_std_error(&err);
     args.err->error_exit = canvas_jpeg_error_exit;
+    args.err->output_message = canvas_jpeg_output_message;
 
     // Establish the setjmp return context for canvas_jpeg_error_exit to use
     if (setjmp(err.setjmp_buffer)) {
