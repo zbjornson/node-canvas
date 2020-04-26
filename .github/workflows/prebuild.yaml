@@ -1,0 +1,161 @@
+name: Make Prebuilds
+on: [push]
+# TODO:
+# on:
+#   release:
+#     types:
+#       - created
+
+# When a new Node.js version is released, publish a new node-canvas release that
+# adds that version to CI and the build? Could do on.push.branches: "master"
+# with paths: ".github/workflows/prebuild.yaml", but how do we get the right
+# $GITHUB_REF?
+
+env:
+  CANVAS_VERSION_TO_BUILD: "2.6.1" # no "v" prefix. TODO switch to $GITHUB_REF if we switch to `on: release`
+  CANVAS_PREBUILT_VERSION: "0.0.1"
+
+jobs:
+  Linux:
+    strategy:
+      matrix:
+        node: [10, 12, 14]
+    name: Node.js ${{ matrix.node }} on Linux
+    runs-on: ubuntu-latest
+    container:
+      image: chearon/canvas-prebuilt:7
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Build
+        env:
+          OS: ${{ runner.os }}
+        run: |
+          npm install -g node-gyp
+          npm install --ignore-scripts
+          . prebuild/$OS/preinstall.sh
+          cp prebuild/$OS/binding.gyp binding.gyp
+          node-gyp rebuild -j 2
+          . prebuild/$OS/bundle.sh
+
+      - name: Test binary
+        run: node -e "require('.')"
+
+      - name: Make bundle
+        id: make_bundle
+        run: |
+          ASSET_NAME=$(. prebuild/tarball.sh $CANVAS_PREBUILT_VERSION)
+          echo "::set-output name=asset_name::${ASSET_NAME}"
+          ls -l
+
+      - name: Upload
+        uses: actions/github-script@0.9.0
+        with:
+          script: |
+            const fs = require("fs");
+            const assetName = "${{ steps.make_bundle.outputs.asset_name }}";
+            const tagName = `v${process.env.CANVAS_PREBUILT_VERSION}`;
+
+            const releases = await github.repos.listReleases({
+              owner: process.env.GITHUB_REPOSITORY.split("/")[0],
+              repo: process.env.GITHUB_REPOSITORY.split("/")[1]
+            });
+            const release = releases.data.find(r => r.tag_name === tagName);
+
+            for (const asset of release.assets) {
+              if (asset.name === assetName) {
+                await github.repos.deleteReleaseAsset({
+                  owner: process.env.GITHUB_REPOSITORY.split("/")[0],
+                  repo: process.env.GITHUB_REPOSITORY.split("/")[1],
+                  asset_id: asset.id
+                });
+                break;
+              }
+            }
+
+            // (This is equivalent to actions/upload-release-asset. We're
+            // already in a script, so might as well do it here.)
+            const r = await github.repos.uploadReleaseAsset({
+              url: release.upload_url,
+              headers: {
+                "content-type": "application/x-gzip",
+                "content-length": `${fs.statSync(assetName).size}`
+              },
+              name: assetName,
+              data: fs.readFileSync(assetName)
+            });
+
+  macOS:
+    strategy:
+      matrix:
+        node: [10, 12, 14]
+    name: Node.js ${{ matrix.node }} on macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Build
+        env:
+          OS: ${{ runner.os }}
+        run: |
+          npm install -g node-gyp
+          npm install --ignore-scripts
+          . prebuild/$OS/preinstall.sh
+          cp prebuild/$OS/binding.gyp binding.gyp
+          node-gyp rebuild -j 2
+          . prebuild/$OS/bundle.sh
+
+      - name: Test binary
+        run: node -e "require('.')"
+
+      - name: Make bundle
+        id: make_bundle
+        run: |
+          ASSET_NAME=$(. prebuild/tarball.sh $CANVAS_PREBUILT_VERSION)
+          echo "::set-output name=asset_name::${ASSET_NAME}"
+          ls -l
+
+      - name: Upload
+        uses: actions/github-script@0.9.0
+        with:
+          script: |
+            const fs = require("fs");
+            const assetName = "${{ steps.make_bundle.outputs.asset_name }}";
+            const tagName = `v${process.env.CANVAS_PREBUILT_VERSION}`;
+
+            const releases = await github.repos.listReleases({
+              owner: process.env.GITHUB_REPOSITORY.split("/")[0],
+              repo: process.env.GITHUB_REPOSITORY.split("/")[1]
+            });
+            const release = releases.data.find(r => r.tag_name === tagName);
+
+            for (const asset of release.assets) {
+              if (asset.name === assetName) {
+                await github.repos.deleteReleaseAsset({
+                  owner: process.env.GITHUB_REPOSITORY.split("/")[0],
+                  repo: process.env.GITHUB_REPOSITORY.split("/")[1],
+                  asset_id: asset.id
+                });
+                break;
+              }
+            }
+
+            // (This is equivalent to actions/upload-release-asset. We're
+            // already in a script, so might as well do it here.)
+            const r = await github.repos.uploadReleaseAsset({
+              url: release.upload_url,
+              headers: {
+                "content-type": "application/x-gzip",
+                "content-length": `${fs.statSync(assetName).size}`
+              },
+              name: assetName,
+              data: fs.readFileSync(assetName)
+            });
