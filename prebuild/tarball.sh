@@ -7,11 +7,11 @@ FILENAME=$(
 ).tar.gz;
 
 # Zip up the release
-tar -C build -czf $FILENAME Release/;
+tar -C build -czf $FILENAME Release
 
 if [ $? -ne 0 ]; then
   echo "failed to make tarball $FILENAME from node-canvas/build"
   exit 1;
 else
-  echo "$FILENAME";
+  echo "::set-output name=asset_name::$FILENAME"
 fi

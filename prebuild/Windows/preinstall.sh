@@ -15,7 +15,8 @@ pacman --noconfirm -S \
   mingw64/mingw-w64-x86_64-giflib \
   mingw64/mingw-w64-x86_64-freetype \
   mingw64/mingw-w64-x86_64-fontconfig \
-  mingw64/mingw-w64-x86_64-librsvg
+  mingw64/mingw-w64-x86_64-librsvg \
+  mingw64/mingw-w64-x86_64-libxml2
 
 # create .lib files for vc++
 
@@ -35,10 +36,3 @@ for lib in $deps; do
 
   rm lib$lib.def
 done
-
-# dependency walker will help us figure out which DLLs 
-# canvas.node directly and indirectly uses
-
-wget -nc http://www.dependencywalker.com/depends22_x64.zip
-unzip -u depends22_x64.zip
-

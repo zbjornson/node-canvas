@@ -28,31 +28,31 @@
         '_USE_MATH_DEFINES' # for M_PI
       ],
       'libraries': [
-        'C:/msys64/mingw64/lib/libcairo-2.lib',
-        'C:/msys64/mingw64/lib/libpng16-16.lib',
-        'C:/msys64/mingw64/lib/libjpeg-8.lib',
-        'C:/msys64/mingw64/lib/libpango-1.0-0.lib',
-        'C:/msys64/mingw64/lib/libpangocairo-1.0-0.lib',
-        'C:/msys64/mingw64/lib/libgobject-2.0-0.lib',
-        'C:/msys64/mingw64/lib/libglib-2.0-0.lib',
-        'C:/msys64/mingw64/lib/libturbojpeg.lib',
-        'C:/msys64/mingw64/lib/libgif-7.lib',
-        'C:/msys64/mingw64/lib/libfreetype-6.lib',
-        'C:/msys64/mingw64/lib/librsvg-2-2.lib'
+        'D:/a/_temp/msys/msys64/mingw64/lib/libcairo-2.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libpng16-16.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libjpeg-8.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libpango-1.0-0.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libpangocairo-1.0-0.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libgobject-2.0-0.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libglib-2.0-0.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libturbojpeg.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libgif-7.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/libfreetype-6.lib',
+        'D:/a/_temp/msys/msys64/mingw64/lib/librsvg-2-2.lib'
       ],
       'include_dirs': [
         '<!(node -e "require(\'nan\')")',
-        'C:/msys64/mingw64/include',
-        'C:/msys64/mingw64/include/pango-1.0',
-        'C:/msys64/mingw64/include/cairo',
-        'C:/msys64/mingw64/include/libpng16',
-        'C:/msys64/mingw64/include/glib-2.0',
-        'C:/msys64/mingw64/lib/glib-2.0/include',
-        'C:/msys64/mingw64/include/pixman-1',
-        'C:/msys64/mingw64/include/freetype2',
-        'C:/msys64/mingw64/include/fontconfig',
-        'C:/msys64/mingw64/include/librsvg-2.0',
-        'C:/msys64/mingw64/include/gdk-pixbuf-2.0'
+        'D:/a/_temp/msys/msys64/mingw64/include',
+        'D:/a/_temp/msys/msys64/mingw64/include/pango-1.0',
+        'D:/a/_temp/msys/msys64/mingw64/include/cairo',
+        'D:/a/_temp/msys/msys64/mingw64/include/libpng16',
+        'D:/a/_temp/msys/msys64/mingw64/include/glib-2.0',
+        'D:/a/_temp/msys/msys64/mingw64/lib/glib-2.0/include',
+        'D:/a/_temp/msys/msys64/mingw64/include/pixman-1',
+        'D:/a/_temp/msys/msys64/mingw64/include/freetype2',
+        'D:/a/_temp/msys/msys64/mingw64/include/fontconfig',
+        'D:/a/_temp/msys/msys64/mingw64/include/librsvg-2.0',
+        'D:/a/_temp/msys/msys64/mingw64/include/gdk-pixbuf-2.0'
       ],
       'configurations': {
         'Debug': {
