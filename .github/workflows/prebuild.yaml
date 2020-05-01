@@ -1,8 +1,8 @@
 name: Make Prebuilds
 on:
   push:
-    branches:
-      - 'master'
+    # branches:
+    #   - 'master'
     paths:
       - '.github/workflows/prebuild.yaml'
 
@@ -12,7 +12,7 @@ on:
 env:
   # These should generally be the same:
   CANVAS_VERSION_TO_BUILD: "2.6.1" # no "v" prefix. TODO switch to $GITHUB_REF if we switch to `on: release`
-  CANVAS_PREBUILT_VERSION: "2.6.1"
+  CANVAS_PREBUILT_VERSION: "0.0.1"
 
 jobs:
   Linux:
