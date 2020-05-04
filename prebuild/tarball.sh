@@ -2,7 +2,8 @@
 FILENAME=$(
   node -e "
     var p = process, v = p.versions, libc = require('detect-libc').family || 'unknown';
-    console.log(['canvas', 'v$CANVAS_PREBUILT_VERSION', 'node-v' + v.modules, p.platform, libc, p.arch].join('-'));
+    const tagName = p.env.UPLOAD_TO || p.env.CANVAS_VERSION_TO_BUILD;
+    console.log(['canvas', tagName, 'node-v' + v.modules, p.platform, libc, p.arch].join('-'));
   "
 ).tar.gz;
 
