@@ -1,33 +1,40 @@
 # Triggering prebuilds:
 # 1. Create a draft release manually using the GitHub UI.
-# 2. Set the `jobs.*.strategy.matrix.node` arrays to the set of Node.js versions
-#    to build for.
-# 3. Set the `jobs.*.strategy.matrix.canvas_tag` arrays to the set of Canvas
-#    tags to build. (Usually this is a single tag, but can be an array when a
-#    new version of Node.js is released and older versions of Canvas need to be
-#    built.)
-# 4. Commit and push this file to master.
+# 2. In the Actions tab, navigate to the "Make Prebuilds" workflow and click
+#    "Run workflow".
+# 3. Set the "Node.js versions" array to the set of Node.js versions to build
+#    for.
+# 4. Set the "Canavs tag(s)" array to the set of Canvas tags to build. (Usually
+#    this is a single tag, but can be an array when a new version of Node.js is
+#    released and older versions of Canvas need to be built.) This must be valid
+#    JSON, i.e. must use double quotes.
 # 5. Once the builds succeed, promote the draft release to a full release.
 
 name: Make Prebuilds
 on:
-  push:
-    branches:
-      - 'master'
-    paths:
-      - '.github/workflows/prebuild.yaml'
+  workflow_dispatch:
+    inputs:
+      nodeVersions:
+        description: "Node.js versions"
+        required: true
+        default: "[8, 9, 10, 11, 12, 13, 14]"
+      canvasTags:
+        description: "Canvas tag(s)"
+        required: true
+        default: "[\"v2.6.1\"]"
+
 # UPLOAD_TO can be specified to upload the release assets under a different tag
 # name (e.g. for testing). If omitted, the assets are published under the same
 # release tag as the canvas version being built.
-# env:
-#   UPLOAD_TO: "v0.0.1"
+env:
+  UPLOAD_TO: "v0.0.1"
 
 jobs:
   Linux:
     strategy:
       matrix:
-        node: [8, 9, 10, 11, 12, 13, 14]
-        canvas_tag: [] # e.g. "v2.6.1"
+        node: ${{ fromJSON(github.event.inputs.nodeVersions) }}
+        canvas_tag: ${{ fromJSON(github.event.canvasTags) }}
     name: ${{ matrix.canvas_tag}}, Node.js ${{ matrix.node }}, Linux
     runs-on: ubuntu-latest
     container:
@@ -99,8 +106,8 @@ jobs:
   macOS:
     strategy:
       matrix:
-        node: [8, 9, 10, 11, 12, 13, 14]
-        canvas_tag: [] # e.g. "v2.6.1"
+        node: ${{ fromJSON(github.event.inputs.nodeVersions) }}
+        canvas_tag: ${{ fromJSON(github.event.canvasTags) }}
     name: ${{ matrix.canvas_tag}}, Node.js ${{ matrix.node }}, macOS
     runs-on: macos-latest
     env:
@@ -165,8 +172,8 @@ jobs:
   Win:
     strategy:
       matrix:
-        node: [8, 9, 10, 11, 12, 13, 14]
-        canvas_tag: [] # e.g. "v2.6.1"
+        node: ${{ fromJSON(github.event.inputs.nodeVersions) }}
+        canvas_tag: ${{ fromJSON(github.event.canvasTags) }}
     name: ${{ matrix.canvas_tag}}, Node.js ${{ matrix.node }}, Windows
     runs-on: windows-latest
     env:
