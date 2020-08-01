@@ -1,7 +1,11 @@
 # dependency walker will help us figure out which DLLs 
 # canvas.node directly and indirectly uses
+echo "Downloading dependency walker...";
+
 wget --no-verbose --no-clobber http://www.dependencywalker.com/depends22_x64.zip
-unzip -u depends22_x64.zip
+7z e depends22_x64.zip
+
+echo "Finding dependencies...";
 
 # write recurisve dependencies of canvas.node into depends.csv
 ./depends -c -oc:depends.csv build/Release/canvas.node;
@@ -10,6 +14,8 @@ unzip -u depends22_x64.zip
   echo "error invoking depends.exe";
   exit 1;
 }
+
+echo "Copying files...";
 
 # case-insensitive intersection of 2nd column of depends.csv
 # and all files ending in .dll in the mingw64 directory
