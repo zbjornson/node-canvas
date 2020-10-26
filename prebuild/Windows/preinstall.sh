@@ -20,6 +20,10 @@ pacman --noconfirm -S \
 
 # create .lib files for vc++
 
+ls -l /mingw64/bin/
+ls -l /mingw64/include/
+ls -l /mingw64/include/harfbuzz/
+
 echo "generating lib files for the MSYS2 dlls"
 for lib in $deps; do
   gendef /mingw64/bin/lib$lib.dll > /dev/null 2>&1 || {
